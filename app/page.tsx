@@ -16,8 +16,8 @@ export default function Home() {
           <h1 className='text-5xl font-extrabold tracking-tight sm:text-7xl'>
             Transkripschon
           </h1>
-          <p className='mt-1 ml-3'>made for our interview</p>
-          <div className='flex-col w-1/3'>
+          <p className='mt-1 ml-3'>made for our interview(no need to comment about the name of the app 🤪)</p>
+          <div className='flex-col w-1/3 mt-6'>
             <div className='flex items-center justify-between text-sm font-medium'>
                 <span>
                   {transcriber.modelLoadingProgress === 0 && `Model not loaded`}
