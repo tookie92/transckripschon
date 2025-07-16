@@ -1,14 +1,11 @@
 'use client'
 
 import axios from 'axios'
-
-import { useCallback, useEffect, useState } from 'react'
-
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import AudioPlayer from '@/components/AudioPlayer'
 import { UrlDialog } from '@/components/UrlDialog'
 import { AudioRecorderDialog } from '@/components/AudioRecorderDialog'
-
 import { Loader } from 'lucide-react'
 import { Transcriber } from '@/lib/types'
 
@@ -32,6 +29,7 @@ export default function AudioManager({
 }) {
   const [audioData, setAudioData] = useState<AudioData | undefined>(undefined)
   const [url, setUrl] = useState<string | undefined>(undefined)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const onUrlChange = (url: string) => {
     transcriber.onInputChange()
@@ -43,6 +41,9 @@ export default function AudioManager({
     transcriber.onInputChange()
     setAudioData(undefined)
     setUrl(undefined)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   const setAudioFromRecording = async (data: Blob) => {
@@ -65,6 +66,36 @@ export default function AudioManager({
     }
 
     fileReader.readAsArrayBuffer(data)
+  }
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    transcriber.onInputChange()
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    resetAudio()
+
+    try {
+      const blobUrl = URL.createObjectURL(file)
+      const fileReader = new FileReader()
+
+      fileReader.onloadend = async () => {
+        const audioCTX = new AudioContext({ sampleRate: 16000 })
+        const arrayBuffer = fileReader.result as ArrayBuffer
+        const decoded = await audioCTX.decodeAudioData(arrayBuffer)
+
+        setAudioData({
+          buffer: decoded,
+          url: blobUrl,
+          source: AudioSource.FILE,
+          mimeType: file.type
+        })
+      }
+
+      fileReader.readAsArrayBuffer(file)
+    } catch (error) {
+      console.error('Error processing audio file:', error)
+    }
   }
 
   const downloadAudioFromUrl = useCallback(
@@ -126,12 +157,28 @@ export default function AudioManager({
         <div className='flex w-full items-center justify-between'>
           <UrlDialog onUrlChange={onUrlChange} />
 
-          <AudioRecorderDialog
-            onLoad={data => {
-              transcriber.onInputChange()
-              setAudioFromRecording(data)
-            }}
-          />
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Upload File
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="audio/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+
+            <AudioRecorderDialog
+              onLoad={data => {
+                transcriber.onInputChange()
+                setAudioFromRecording(data)
+              }}
+            />
+          </div>
         </div>
 
         {audioData && (

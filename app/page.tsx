@@ -14,9 +14,9 @@ export default function Home() {
         <div className='flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex-1'>
             <h1 className='text-5xl font-extrabold tracking-tight sm:text-7xl'>
-              Whisper
+              Transkripschon
             </h1>
-            <p className='mt-1 ml-3'>Audio to text transcription</p>
+            <p className='mt-1 ml-3'>made for our interview</p>
           </div>
           <div className='flex-1'>
             <div className='flex items-center justify-between text-sm font-medium'>
