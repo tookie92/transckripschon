@@ -1,5 +1,6 @@
 export interface TranscriberData {
   text: string
+  timestamp: [number, number | null]
 }
 
 export interface Transcriber {
