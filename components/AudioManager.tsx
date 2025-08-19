@@ -7,7 +7,14 @@ import AudioPlayer from '@/components/AudioPlayer'
 import { UrlDialog } from '@/components/UrlDialog'
 import { AudioRecorderDialog } from '@/components/AudioRecorderDialog'
 import { Loader } from 'lucide-react'
-import { Transcriber } from '@/lib/types'
+import { Transcriber, SpeakerCountOption } from '@/lib/types'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export enum AudioSource {
   URL = 'URL',
@@ -29,6 +36,7 @@ export default function AudioManager({
 }) {
   const [audioData, setAudioData] = useState<AudioData | undefined>(undefined)
   const [url, setUrl] = useState<string | undefined>(undefined)
+  const [speakerCount, setSpeakerCount] = useState<SpeakerCountOption>(1) // Défaut à 1
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const onUrlChange = (url: string) => {
@@ -188,20 +196,42 @@ export default function AudioManager({
               mimeType={audioData.mimeType}
             />
 
+            {/* Sélecteur du nombre de locuteurs */}
+            <div className="w-full">
+              <label className="block text-sm font-medium mb-2">
+                Number of speakers
+              </label>
+              <Select 
+                value={speakerCount.toString()} 
+                onValueChange={(value) => setSpeakerCount(parseInt(value) as SpeakerCountOption)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 speaker</SelectItem>
+                  <SelectItem value="2">2 speakers</SelectItem>
+                  <SelectItem value="3">3 speakers</SelectItem>
+                  <SelectItem value="4">4 speakers</SelectItem>
+                  <SelectItem value="5">5 speakers</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className='mt-auto flex w-full items-center justify-between'>
-              <Button onClick={() => transcriber.start(audioData.buffer)}>
+              <Button onClick={() => transcriber.start(audioData.buffer, speakerCount)}>
                 {transcriber.isModelLoading ? (
                   <>
-                    <Loader className='animate-spin' />
-                    <span>Loading model</span>
+                    <Loader className='animate-spin mr-2' />
+                    <span>Model loading</span>
                   </>
                 ) : transcriber.isProcessing ? (
                   <>
-                    <Loader className='animate-spin' />
-                    <span>Transcribing</span>
+                    <Loader className='animate-spin mr-2' />
+                    <span>Transcription in progress</span>
                   </>
                 ) : (
-                  <span>Transcribe</span>
+                  <span>Transcript ({speakerCount} speaker{speakerCount !== 1 ? 's' : ''})</span>
                 )}
               </Button>
 
