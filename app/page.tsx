@@ -1,9 +1,10 @@
 'use client'
 
 import Transcript from '@/components/transcript'
-import AudioManager from '@/components/AudioManager'
+import AudioManager from '@/components/MediaManager'
 import { useTranscriber } from '@/hooks/useTranscriber'
 import { Progress } from '@/components/ui/progress'
+import MediaManager from '@/components/MediaManager'
 
 export default function Home() {
   const transcriber = useTranscriber()
@@ -17,7 +18,7 @@ export default function Home() {
             Transkripschon
           </h1>
           <p className='mt-1 ml-3'>made for our interview(no need to comment about the name of the app 🤪)</p>
-          <div className='flex-col w-1/3 mt-6'>
+          {/* <div className='flex-col w-1/3 mt-6'>
             <div className='flex items-center justify-between text-sm font-medium'>
                 <span>
                   {transcriber.modelLoadingProgress === 0 && `Model not loaded`}
@@ -32,10 +33,10 @@ export default function Home() {
                 value={transcriber.modelLoadingProgress}
                 max={1}
               />
-          </div>
+          </div> */}
         </div>
         <div className='mt-8 flex flex-col gap-6 sm:flex-row'>
-          <AudioManager transcriber={transcriber} />
+          <MediaManager transcriber={transcriber} />
           <Transcript transcriber={transcriber} />
         </div>
       </div>
