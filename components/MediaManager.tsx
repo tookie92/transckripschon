@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import AudioPlayer from '@/components/AudioPlayer'
 import { UrlDialog } from '@/components/UrlDialog'
 import { AudioRecorderDialog } from '@/components/AudioRecorderDialog'
-import { Loader, VideoIcon, AudioLinesIcon } from 'lucide-react'
+import { Loader, VideoIcon, AudioLinesIcon, LanguagesIcon } from 'lucide-react'
 import { Transcriber, SpeakerCountOption, MediaSource } from '@/lib/types'
 import {
   Select,
@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useVideoAudioExtractor } from '@/hooks/useVideoExtractor'
-
 
 interface MediaData {
   buffer: AudioBuffer
@@ -171,8 +170,7 @@ export default function MediaManager({
               mimeType: mimeType
             })
           } else if (mimeType.startsWith('video/')) {
-            // Pour les URLs vidéo, nous ne pouvons pas facilement extraire l'audio côté client
-            console.error('Video URL extraction is not supported in this version. Please use a video file upload.')
+            console.error('Video URL extraction is not supported. Please use video file upload.')
           }
 
         } catch (error) {
@@ -194,13 +192,12 @@ export default function MediaManager({
   }, [downloadMediaFromUrl, url])
 
   return (
-    <section className='w-full max-w-2xl rounded-lg border bg-white p-6 shadow-md'>
+    <section className='w-full max-w-2xl rounded-lg border bg-white p-6 shadow-md dark:bg-gray-800'>
       <div className='flex h-full flex-col items-start gap-6'>
         <div className='flex w-full items-center justify-between'>
           <UrlDialog onUrlChange={onUrlChange} />
 
           <div className="flex gap-2">
-            {/* Bouton Audio */}
             <Button 
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
@@ -217,7 +214,6 @@ export default function MediaManager({
               className="hidden"
             />
 
-            {/* Bouton Vidéo */}
             <Button 
               variant="outline"
               onClick={() => videoInputRef.current?.click()}
@@ -266,7 +262,6 @@ export default function MediaManager({
               mimeType={mediaData.mimeType}
             />
 
-            {/* Indicateur du type de média */}
             <div className="w-full">
               <div className={`inline-flex items-center rounded-full px-3 py-1 text-sm ${
                 mediaData.source === MediaSource.VIDEO 
@@ -287,7 +282,16 @@ export default function MediaManager({
               </div>
             </div>
 
-            {/* Sélecteur du nombre de locuteurs */}
+            {/* Language info if available */}
+            {transcriber.output?.language && (
+              <div className="w-full">
+                <div className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                  <LanguagesIcon className="h-4 w-4 mr-1" />
+                  Detected: {transcriber.output.language}
+                </div>
+              </div>
+            )}
+
             <div className="w-full">
               <label className="block text-sm font-medium mb-2">
                 Number of speakers
@@ -312,20 +316,21 @@ export default function MediaManager({
             <div className='mt-auto flex w-full items-center justify-between'>
               <Button 
                 onClick={() => transcriber.start(mediaData.buffer, speakerCount)}
-                disabled={isExtracting}
+                disabled={isExtracting || transcriber.isProcessing}
+                className="min-w-[200px]"
               >
                 {transcriber.isModelLoading ? (
                   <>
                     <Loader className='animate-spin mr-2' />
-                    <span>Model loading</span>
+                    <span>Loading model...</span>
                   </>
                 ) : transcriber.isProcessing ? (
                   <>
                     <Loader className='animate-spin mr-2' />
-                    <span>Transcription in progress</span>
+                    <span>Transcribing...</span>
                   </>
                 ) : (
-                  <span>Transcript ({speakerCount} speaker{speakerCount !== 1 ? 's' : ''})</span>
+                  <span>Transcribe ({speakerCount} speaker{speakerCount !== 1 ? 's' : ''})</span>
                 )}
               </Button>
 

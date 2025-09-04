@@ -9,6 +9,7 @@ export interface TranscriberData {
   segments: TranscriptSegment[];
   text: string;
   speakers: string[];
+  language?: string; // Added language detection
 }
 
 export interface Transcriber {
@@ -16,7 +17,7 @@ export interface Transcriber {
   isProcessing: boolean;
   isModelLoading: boolean;
   modelLoadingProgress: number;
-  start: (audioData: AudioBuffer | undefined, speakerCount?: number) => void;
+  start: (audioData: AudioBuffer | undefined, speakerCount?: number | 'auto') => void;
   output?: TranscriberData;
 }
 
@@ -26,12 +27,11 @@ export type SpeakerColors = {
 
 export type SpeakerCountOption = 1 | 2 | 3 | 4 | 5;
 
-// Nouveau type pour les sources
 export enum MediaSource {
   URL = 'URL',
   FILE = 'FILE',
   RECORDING = 'RECORDING',
-  VIDEO = 'VIDEO' // Nouvelle source
+  VIDEO = 'VIDEO'
 }
 
 export interface MediaData {
@@ -39,6 +39,7 @@ export interface MediaData {
   url: string;
   source: MediaSource;
   mimeType: string;
-  duration?: number; // Optionnel pour la vidéo
+  duration?: number;
 }
+
 export type ExportFormat = 'txt' | 'srt';

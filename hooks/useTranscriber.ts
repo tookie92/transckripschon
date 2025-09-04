@@ -8,7 +8,6 @@ export function useTranscriber(): Transcriber {
   const [isModelLoading, setIsModelLoading] = useState(false);
   const [modelLoadingProgress, setModelLoadingProgress] = useState(0);
 
-  // On initialise le worker
   const webWorker = useWorker((event) => {
     const message = event.data;
 
@@ -18,7 +17,12 @@ export function useTranscriber(): Transcriber {
         break;
       
       case 'complete':
-        setOutput(message.data);
+        setOutput({
+          segments: message.data.segments,
+          text: message.data.text,
+          speakers: message.data.speakers,
+          language: message.data.language // Include detected language
+        });
         setIsProcessing(false);
         break;
       
@@ -32,7 +36,7 @@ export function useTranscriber(): Transcriber {
       
       case 'error':
         setIsProcessing(false);
-        console.error("Erreur de transcription:", message.error);
+        console.error("Transcription error:", message.error);
         break;
       
       default:
@@ -40,12 +44,10 @@ export function useTranscriber(): Transcriber {
     }
   });
 
-  // Réinitialise la transcription quand l'input change
   const onInputChange = useCallback(() => {
     setOutput(undefined);
   }, []);
 
-  // Fonction pour démarrer la transcription
   const start = useCallback(
     async (audioData: AudioBuffer | undefined, speakerCount: number | 'auto' = 'auto') => {
       if (!audioData) return;
@@ -54,10 +56,8 @@ export function useTranscriber(): Transcriber {
       setIsProcessing(true);
 
       try {
-        // Convertit l'audio en format compatible avec Whisper
         let audio: Float32Array;
         if (audioData.numberOfChannels === 2) {
-          // Si stéréo, on mixe les 2 canaux
           const left = audioData.getChannelData(0);
           const right = audioData.getChannelData(1);
           audio = new Float32Array(left.length);
@@ -65,25 +65,22 @@ export function useTranscriber(): Transcriber {
             audio[i] = (left[i] + right[i]) / 2;
           }
         } else {
-          // Si mono, on prend directement le canal
           audio = audioData.getChannelData(0);
         }
 
-        // Envoie à notre worker
         webWorker?.postMessage({ 
           audio,
           speakerCount: speakerCount === 'auto' ? null : speakerCount
         });
 
       } catch (error) {
-        console.error("Erreur de préparation audio:", error);
+        console.error("Audio preparation error:", error);
         setIsProcessing(false);
       }
     },
     [webWorker]
   );
 
-  // On retourne tout sous forme d'objet
   return useMemo(() => ({
     onInputChange,
     isProcessing,
