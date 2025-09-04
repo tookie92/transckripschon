@@ -21,7 +21,7 @@ export function useTranscriber(): Transcriber {
           segments: message.data.segments,
           text: message.data.text,
           speakers: message.data.speakers,
-          language: message.data.language // Include detected language
+          language: message.data.language
         });
         setIsProcessing(false);
         break;

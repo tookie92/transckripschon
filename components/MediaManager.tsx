@@ -282,7 +282,6 @@ export default function MediaManager({
               </div>
             </div>
 
-            {/* Language info if available */}
             {transcriber.output?.language && (
               <div className="w-full">
                 <div className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 dark:bg-gray-700 dark:text-gray-200">

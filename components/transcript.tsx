@@ -60,7 +60,6 @@ export default function Transcript({ transcriber }: { transcriber: Transcriber }
     
     return (
       <>
-        {/* Language display */}
         {output.language && (
           <div className="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <LanguagesIcon className="h-4 w-4" />
@@ -68,7 +67,6 @@ export default function Transcript({ transcriber }: { transcriber: Transcriber }
           </div>
         )}
 
-        {/* Speakers */}
         <div className="mb-4 flex flex-wrap gap-2">
           {output.speakers.map((speaker) => (
             <span 
@@ -82,7 +80,6 @@ export default function Transcript({ transcriber }: { transcriber: Transcriber }
           ))}
         </div>
 
-        {/* Transcript segments */}
         <div className="space-y-3">
           {output.segments.map((segment, i) => (
             <div key={i} className="flex gap-3 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
